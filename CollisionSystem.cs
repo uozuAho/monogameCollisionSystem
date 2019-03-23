@@ -181,45 +181,9 @@ public class CollisionSystem
         // enable double buffering
 //        StdDraw.enableDoubleBuffering();
 
-        // the array of particles
-        Particle[] particles;
-
-        // create n random particles
-        if (args.Length == 1) {
-            int n = int.Parse(args[0]);
-            particles = new Particle[n];
-            for (int i = 0; i < n; i++)
-                particles[i] = new Particle();
-        }
-
-        // or read from standard input
-        else
-        {
-            var line = Console.ReadLine();
-            int numParticles = int.Parse(line);
-            particles = new Particle[numParticles];
-            for (int i = 0; i < numParticles; i++)
-            {
-                line = Console.ReadLine();
-                if (line == null) break;
-                var values = line.Split(' ');
-                double rx = double.Parse(values[0]);
-                double ry     = double.Parse(values[1]);
-                double vx     = double.Parse(values[2]);
-                double vy     = double.Parse(values[3]);
-                double radius = double.Parse(values[4]);
-                double mass   = double.Parse(values[5]);
-                int r = int.Parse(values[6]);
-                int g         = int.Parse(values[7]);
-                int b         = int.Parse(values[8]);
-                Color color   = new Color(r, g, b);
-                particles[i] = new Particle(rx, ry, vx, vy, radius, mass, color);
-            }
-        }
-
         // create collision system and simulate
-        CollisionSystem system = new CollisionSystem(particles);
-        system.simulate(10000);
+//        CollisionSystem system = new CollisionSystem(particles);
+//        system.simulate(10000);
     }
       
 }

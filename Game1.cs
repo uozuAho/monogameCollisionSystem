@@ -8,9 +8,12 @@ namespace particles
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        private readonly CollisionSystem _collisionSystem;
 
-        public Game1()
+        public Game1(CollisionSystem collisionSystem)
         {
+            _collisionSystem = collisionSystem;
+            
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
