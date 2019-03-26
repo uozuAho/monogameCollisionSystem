@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace particles
 {
@@ -31,9 +33,10 @@ namespace particles
     {
         private const double HZ = 0.5; // number of redraw events per clock tick
 
-        private MinPQ<Event> pq; // the priority queue
-        private double t = 0.0; // simulation clock time
+        private MinPQ<Event> _pq; // the priority queue
         private Particle[] particles; // the array of particles
+        private TimeSpan _lastEventTime = TimeSpan.Zero;
+        private Texture2D _particleTexture;
 
         /**
          * Initializes a system with the specified collection of particles.
@@ -46,38 +49,75 @@ namespace particles
             this.particles = particles.Select(p => p.Clone()).ToArray(); // defensive copy
         }
 
+        public void Init(Texture2D particleTexture)
+        {
+            _particleTexture = particleTexture;
+            
+            // initialize PQ with collision events
+            _pq = new MinPQ<Event>(new EventComparer());
+            foreach (var p in particles)
+            {
+                predict(p);
+            }
+        }
+        
+        public void Update(GameTime now)
+        {
+            // todo: this assumes particle time is in seconds (looks like it)
+            // handle all events up to current time
+            while (_pq.Peek().time <= now.ElapsedGameTime)
+            {
+                var event_ = _pq.Pop();
+                if (!event_.isValid()) continue;
+
+                var a = event_.a;
+                var b = event_.b;
+
+                // update all particles to current time
+                foreach (var p in particles)
+                {
+                    p.move((event_.time - _lastEventTime).TotalSeconds);
+                }
+
+                _lastEventTime = event_.time;
+
+                if (a != null && b != null) a.bounceOff(b);
+                else if (a != null) a.bounceOffVerticalWall();
+                else if (b != null) b.bounceOffHorizontalWall();
+    
+                // update the priority queue with new collisions involving a or b
+                predict(a);
+                predict(b);
+                
+//                Console.WriteLine(now.ElapsedGameTime.TotalSeconds);
+            }
+        }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            foreach (var particle in particles)
+            {
+                particle.Draw(spriteBatch, _particleTexture);
+            }
+        }
+
         // updates priority queue with all new events for particle a
-        private void predict(Particle a, double limit)
+        private void predict(Particle a)
         {
             if (a == null) return;
 
             // particle-particle collisions
-            for (int i = 0; i < particles.Length; i++)
+            foreach (var p in particles)
             {
-                double dt = a.timeToHit(particles[i]);
-                if (t + dt <= limit)
-                    pq.Push(new Event(t + dt, a, particles[i]));
+                var dt = a.timeToHit(p);
+                _pq.Push(new Event(_lastEventTime + dt, a, p));
             }
 
             // particle-wall collisions
-            double dtX = a.timeToHitVerticalWall();
-            double dtY = a.timeToHitHorizontalWall();
-            if (t + dtX <= limit) pq.Push(new Event(t + dtX, a, null));
-            if (t + dtY <= limit) pq.Push(new Event(t + dtY, null, a));
-        }
-
-        // redraw all particles
-        private void redraw(double limit)
-        {
-//        StdDraw.clear();
-//        for (int i = 0; i < particles.length; i++) {
-//            particles[i].draw();
-//        }
-//        StdDraw.show();
-//        StdDraw.pause(20);
-//        if (t < limit) {
-//            pq.insert(new Event(t + 1.0 / HZ, null, null));
-//        }
+            var dtX = a.timeToHitVerticalWall();
+            var dtY = a.timeToHitHorizontalWall();
+            _pq.Push(new Event(_lastEventTime + dtX, a, null));
+            _pq.Push(new Event(_lastEventTime + dtY, null, a));
         }
 
         private class EventComparer : IComparer<Event>
@@ -88,78 +128,24 @@ namespace particles
             }
         }
 
-        /**
-         * Simulates the system of particles for the specified amount of time.
-         *
-         * - predict next collision for all particles, push collisions to queue
-         * - push redraw to queue
-         * - while queue is not empty
-         *     - pop from queue
-         *     - update all particles to current time
-         *     - recalculate next collisions for event popped off queue, push to queue
-         *
-         * 
-         * @param  limit the amount of time
-         */
-        public void simulate(double limit)
-        {
-
-            // initialize PQ with collision events and redraw event
-            pq = new MinPQ<Event>(new EventComparer());
-            for (int i = 0; i < particles.Length; i++)
-            {
-                predict(particles[i], limit);
-            }
-
-            pq.Push(new Event(0, null, null)); // redraw event
-
-
-            // the main event-driven simulation loop
-            while (!pq.IsEmpty)
-            {
-
-                // get impending event, discard if invalidated
-                Event e = pq.Pop();
-                if (!e.isValid()) continue;
-                Particle a = e.a;
-                Particle b = e.b;
-
-                // physical collision, so update positions, and then simulation clock
-                for (int i = 0; i < particles.Length; i++)
-                    particles[i].move(e.time - t);
-                t = e.time;
-
-                // process event
-                if (a != null && b != null) a.bounceOff(b); // particle-particle collision
-                else if (a != null && b == null) a.bounceOffVerticalWall(); // particle-wall collision
-                else if (a == null && b != null) b.bounceOffHorizontalWall(); // particle-wall collision
-                else if (a == null && b == null) redraw(limit); // redraw event
-
-                // update the priority queue with new collisions involving a or b
-                predict(a, limit);
-                predict(b, limit);
-            }
-        }
-
         /// <summary>
         /// An event during a particle collision simulation. Each event contains
         /// the time at which it will occur (assuming no supervening actions)
         /// and the particles a and b involved.
         /// </summary>
         /// <remarks>
-        ///  - a and b both null:      redraw event
         ///  - a null, b not null:     collision with vertical wall
         ///  - a not null, b null:     collision with horizontal wall
         ///  - a and b both not null:  binary collision between a and b
         /// </remarks>
         private class Event : IComparable<Event>
         {
-            public readonly double time; // time that event is scheduled to occur
+            public readonly TimeSpan time; // time that event is scheduled to occur
             public readonly Particle a, b; // particles involved in event, possibly null
             public readonly int countA, countB; // collision counts at event creation
 
             // create a new event to occur at time t involving a and b
-            public Event(double t, Particle a, Particle b)
+            public Event(TimeSpan t, Particle a, Particle b)
             {
                 this.time = t;
                 this.a = a;
@@ -184,27 +170,5 @@ namespace particles
                 return true;
             }
         }
-
-        /**
-         * Unit tests the {@code CollisionSystem} data type.
-         * Reads in the particle collision system from a standard input
-         * (or generates {@code N} random particles if a command-line integer
-         * is specified); simulates the system.
-         *
-         * @param args the command-line arguments
-         */
-        public static void main(String[] args)
-        {
-
-//        StdDraw.setCanvasSize(600, 600);
-
-            // enable double buffering
-//        StdDraw.enableDoubleBuffering();
-
-            // create collision system and simulate
-//        CollisionSystem system = new CollisionSystem(particles);
-//        system.simulate(10000);
-        }
-
     }
 }

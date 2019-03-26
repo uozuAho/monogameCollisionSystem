@@ -13,6 +13,7 @@ namespace particles
             
             var collisionSystem = InitCollisionSystem(args);
             
+            Console.WriteLine("starting game");
             using (var game = new Game1(collisionSystem))
                 game.Run();
         }

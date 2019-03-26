@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace particles
 {
@@ -41,7 +42,7 @@ namespace particles
          */
         public int count { get; private set; }
 
-        private const double INFINITY = double.PositiveInfinity;
+        private static readonly TimeSpan INFINITY = TimeSpan.MaxValue;
 
         private double rx, ry; // position
         private double vx, vy; // velocity
@@ -82,8 +83,8 @@ namespace particles
          * The position is uniform in the unit box; the velocity in
          * either direction is chosen uniformly at random.
          */
-        public Particle()
-        {
+//        public Particle()
+//        {
 //        rx     = StdRandom.uniform(0.0, 1.0);
 //        ry     = StdRandom.uniform(0.0, 1.0);
 //        vx     = StdRandom.uniform(-0.005, 0.005);
@@ -91,7 +92,7 @@ namespace particles
 //        radius = 0.02;
 //        mass   = 0.5;
 //        color  = Color.BLACK;
-        }
+//        }
 
         /**
          * Moves this particle in a straight line (based on its velocity)
@@ -105,25 +106,21 @@ namespace particles
             ry += vy * dt;
         }
 
-        /**
-         * Draws this particle to standard draw.
-         */
-        public void draw()
+        public void Draw(SpriteBatch spriteBatch, Texture2D texture2D)
         {
-//        StdDraw.setPenColor(color);
-//        StdDraw.filledCircle(rx, ry, radius);
+            spriteBatch.Draw(texture2D, new Rectangle((int)rx, (int)ry, 20, 20), Color.Red);
         }
 
         /**
          * Returns the amount of time for this particle to collide with the specified
-         * particle, assuming no interening collisions.
+         * particle, assuming no intervening collisions.
          *
          * @param  that the other particle
          * @return the amount of time for this particle to collide with the specified
-         *         particle, assuming no interening collisions; 
+         *         particle, assuming no intervening collisions; 
          *         {@code Double.POSITIVE_INFINITY} if the particles will not collide
          */
-        public double timeToHit(Particle that)
+        public TimeSpan timeToHit(Particle that)
         {
             if (this == that) return INFINITY;
             double dx = that.rx - this.rx;
@@ -139,7 +136,7 @@ namespace particles
             double d = (dvdr * dvdr) - dvdv * (drdr - sigma * sigma);
             // if (drdr < sigma*sigma) StdOut.println("overlapping particles");
             if (d < 0) return INFINITY;
-            return -(dvdr + Math.Sqrt(d)) / dvdv;
+            return TimeSpan.FromSeconds(-(dvdr + Math.Sqrt(d)) / dvdv);
         }
 
         /**
@@ -151,10 +148,10 @@ namespace particles
          *         {@code Double.POSITIVE_INFINITY} if the particle will not collide
          *         with a vertical wall
          */
-        public double timeToHitVerticalWall()
+        public TimeSpan timeToHitVerticalWall()
         {
-            if (vx > 0) return (1.0 - rx - radius) / vx;
-            else if (vx < 0) return (radius - rx) / vx;
+            if (vx > 0) return TimeSpan.FromSeconds((1.0 - rx - radius) / vx);
+            else if (vx < 0) return TimeSpan.FromSeconds((radius - rx) / vx);
             else return INFINITY;
         }
 
@@ -167,10 +164,10 @@ namespace particles
          *         {@code Double.POSITIVE_INFINITY} if the particle will not collide
          *         with a horizontal wall
          */
-        public double timeToHitHorizontalWall()
+        public TimeSpan timeToHitHorizontalWall()
         {
-            if (vy > 0) return (1.0 - ry - radius) / vy;
-            else if (vy < 0) return (radius - ry) / vy;
+            if (vy > 0) return TimeSpan.FromSeconds((1.0 - ry - radius) / vy);
+            else if (vy < 0) return TimeSpan.FromSeconds((radius - ry) / vy);
             else return INFINITY;
         }
 

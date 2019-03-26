@@ -19,18 +19,11 @@ namespace particles
             IsMouseVisible = true;
         }
 
-        protected override void Initialize()
-        {
-            // TODO: Add your initialization logic here
-
-            base.Initialize();
-        }
-
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            // TODO: use this.Content to load your game content here
+            var particleTexture = Content.Load<Texture2D>("dot_20x20");
+            _collisionSystem.Init(particleTexture);
         }
 
         protected override void Update(GameTime gameTime)
@@ -38,7 +31,7 @@ namespace particles
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            _collisionSystem.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -47,7 +40,9 @@ namespace particles
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            spriteBatch.Begin();
+            _collisionSystem.Draw(spriteBatch);
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }

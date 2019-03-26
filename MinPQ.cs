@@ -15,7 +15,7 @@ namespace particles
         {
             _minHeap = new BinaryMinHeap<T>(comparer);
         }
-        
+
         public bool IsEmpty => _minHeap.Size == 0;
 
         public void Push(T item)
@@ -26,6 +26,11 @@ namespace particles
         public T Pop()
         {
             return _minHeap.RemoveMin();
+        }
+
+        public T Peek()
+        {
+            return _minHeap.PeekMin();
         }
     }
 }
