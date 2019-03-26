@@ -41,10 +41,10 @@ namespace particles
                 {
                     var line = file.ReadLine();
                     var values = line.Trim().Split(' ');
-                    double rx = double.Parse(values[0]);
-                    double ry = double.Parse(values[1]);
-                    double vx = double.Parse(values[2]);
-                    double vy = double.Parse(values[3]);
+                    double rx = double.Parse(values[0]) * 200;
+                    double ry = double.Parse(values[1]) * 200;
+                    double vx = double.Parse(values[2]) * 200;
+                    double vy = double.Parse(values[3]) * 200;
                     double radius = double.Parse(values[4]);
                     double mass = double.Parse(values[5]);
                     int r = int.Parse(values[6]);
