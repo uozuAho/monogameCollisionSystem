@@ -24,7 +24,6 @@ namespace particles.monogame
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             var particleTexture = Content.Load<Texture2D>("dot_20x20");
-            _collisionSystem.Init();
             _collisionSystemRenderer = new CollisionSystemRenderer(_collisionSystem, particleTexture);
         }
 

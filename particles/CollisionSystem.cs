@@ -29,7 +29,7 @@ namespace particles
     public class CollisionSystem
     {
         private MinPQ<Event> _pq; // the priority queue
-        public Particle[] particles; // the array of particles
+        public Particle[] Particles { get; private set; }
         private TimeSpan _lastEventTime = TimeSpan.Zero;
 
         /**
@@ -38,16 +38,16 @@ namespace particles
          *
          * @param  particles the array of particles
          */
-        public CollisionSystem(Particle[] particles)
+        public CollisionSystem(IEnumerable<Particle> particles)
         {
-            this.particles = particles.Select(p => p.Clone()).ToArray(); // defensive copy
+            Particles = particles.ToArray();
+            _pq = new MinPQ<Event>(new EventComparer());
+            PredictAllParticles();
         }
 
-        public void Init()
+        private void PredictAllParticles()
         {
-            // initialize PQ with collision events
-            _pq = new MinPQ<Event>(new EventComparer());
-            foreach (var p in particles)
+            foreach (var p in Particles)
             {
                 predict(p);
             }
@@ -66,7 +66,7 @@ namespace particles
                 var b = event_.b;
 
                 // update all particles to current time
-                foreach (var p in particles)
+                foreach (var p in Particles)
                 {
                     p.move((event_.time - _lastEventTime).TotalSeconds);
                 }
@@ -89,7 +89,7 @@ namespace particles
             if (a == null) return;
 
             // particle-particle collisions
-            foreach (var p in particles)
+            foreach (var p in Particles)
             {
                 var dt = a.timeToHit(p);
                 _pq.Push(new Event(_lastEventTime + dt, a, p));

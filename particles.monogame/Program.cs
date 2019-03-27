@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace particles.monogame
 {
@@ -26,34 +27,8 @@ namespace particles.monogame
 
         private static Particle[] GetParticlesFromArgs(string[] args)
         {
-            Particle[] particles;
-
             var path = args[0];
-
-            using (var file = File.OpenText(path))
-            {
-                var firstLine = file.ReadLine();
-                int numParticles = int.Parse(firstLine);
-                particles = new Particle[numParticles];
-                
-                for (int i = 0; i < numParticles; i++)
-                {
-                    var line = file.ReadLine();
-                    var values = line.Trim().Split(' ');
-                    double rx = double.Parse(values[0]) * 200;
-                    double ry = double.Parse(values[1]) * 200;
-                    double vx = double.Parse(values[2]) * 200;
-                    double vy = double.Parse(values[3]) * 200;
-                    double radius = double.Parse(values[4]);
-                    double mass = double.Parse(values[5]);
-                    int r = int.Parse(values[6]);
-                    int g = int.Parse(values[7]);
-                    int b = int.Parse(values[8]);
-                    particles[i] = new Particle(rx, ry, vx, vy, radius, mass);
-                }
-            }
-
-            return particles;
+            return ParticlesFileReader.FromFile(path).ToArray();
         }
     }
 }

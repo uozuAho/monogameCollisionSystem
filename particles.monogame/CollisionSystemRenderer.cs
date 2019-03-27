@@ -16,7 +16,7 @@ namespace particles.monogame
         
         public void Draw(SpriteBatch spriteBatch)
         {
-            foreach (var particle in _system.particles)
+            foreach (var particle in _system.Particles)
             {
                 DrawParticle(spriteBatch, particle);
             }
