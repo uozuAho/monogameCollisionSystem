@@ -44,7 +44,8 @@ namespace particles
 
         private static readonly TimeSpan INFINITY = TimeSpan.MaxValue;
 
-        private double rx, ry; // position
+        public double posX { get; private set; }
+        public double posY { get; private set; }
         private double vx, vy; // velocity
         private readonly double radius; // radius
         private readonly double mass; // mass
@@ -62,20 +63,20 @@ namespace particles
          * @param  mass the mass
          * @param  color the color
          */
-        public Particle(double rx, double ry, double vx, double vy, double radius, double mass, Color color)
+        public Particle(double posX, double posY, double vx, double vy, double radius, double mass)
         {
             this.vx = vx;
             this.vy = vy;
-            this.rx = rx;
-            this.ry = ry;
+            this.posX = posX;
+            this.posY = posY;
             this.radius = radius;
             this.mass = mass;
-            this.color = color;
+            this.color = Color.Red;
         }
 
         public Particle Clone()
         {
-            return new Particle(rx, ry, vx, vy, radius, mass, color);
+            return new Particle(posX, posY, vx, vy, radius, mass);
         }
 
         /**
@@ -102,13 +103,13 @@ namespace particles
          */
         public void move(double dt)
         {
-            rx += vx * dt;
-            ry += vy * dt;
+            posX += vx * dt;
+            posY += vy * dt;
         }
 
         public void Draw(SpriteBatch spriteBatch, Texture2D texture2D)
         {
-            spriteBatch.Draw(texture2D, new Rectangle((int)rx, (int)ry, 20, 20), Color.Red);
+            spriteBatch.Draw(texture2D, new Rectangle((int)posX, (int)posY, 20, 20), Color.Red);
         }
 
         /**
@@ -123,8 +124,8 @@ namespace particles
         public TimeSpan timeToHit(Particle that)
         {
             if (this == that) return INFINITY;
-            double dx = that.rx - this.rx;
-            double dy = that.ry - this.ry;
+            double dx = that.posX - this.posX;
+            double dy = that.posY - this.posY;
             double dvx = that.vx - this.vx;
             double dvy = that.vy - this.vy;
             double dvdr = dx * dvx + dy * dvy;
@@ -150,8 +151,8 @@ namespace particles
          */
         public TimeSpan timeToHitVerticalWall()
         {
-            if (vx > 0) return TimeSpan.FromSeconds((1.0 - rx - radius) / vx);
-            else if (vx < 0) return TimeSpan.FromSeconds((radius - rx) / vx);
+            if (vx > 0) return TimeSpan.FromSeconds((1.0 - posX - radius) / vx);
+            else if (vx < 0) return TimeSpan.FromSeconds((radius - posX) / vx);
             else return INFINITY;
         }
 
@@ -166,8 +167,8 @@ namespace particles
          */
         public TimeSpan timeToHitHorizontalWall()
         {
-            if (vy > 0) return TimeSpan.FromSeconds((1.0 - ry - radius) / vy);
-            else if (vy < 0) return TimeSpan.FromSeconds((radius - ry) / vy);
+            if (vy > 0) return TimeSpan.FromSeconds((1.0 - posY - radius) / vy);
+            else if (vy < 0) return TimeSpan.FromSeconds((radius - posY) / vy);
             else return INFINITY;
         }
 
@@ -180,8 +181,8 @@ namespace particles
          */
         public void bounceOff(Particle that)
         {
-            double dx = that.rx - this.rx;
-            double dy = that.ry - this.ry;
+            double dx = that.posX - this.posX;
+            double dy = that.posY - this.posY;
             double dvx = that.vx - this.vx;
             double dvy = that.vy - this.vy;
             double dvdr = dx * dvx + dy * dvy; // dv dot dr

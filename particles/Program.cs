@@ -50,8 +50,7 @@ namespace particles
                     int r = int.Parse(values[6]);
                     int g = int.Parse(values[7]);
                     int b = int.Parse(values[8]);
-                    Color color = new Color(r, g, b);
-                    particles[i] = new Particle(rx, ry, vx, vy, radius, mass, color);
+                    particles[i] = new Particle(rx, ry, vx, vy, radius, mass);
                 }
             }
 
