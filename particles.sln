@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "particles.monogame", "parti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "particles.test", "particles.test\particles.test.csproj", "{DB415810-CCB0-46E8-9664-7477DA2C6E9D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "particles", "particles\particles.csproj", "{6FA74C5F-A387-409A-8F5D-5EED9FB705BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,17 @@ Global
 		{DB415810-CCB0-46E8-9664-7477DA2C6E9D}.Release|x64.Build.0 = Release|Any CPU
 		{DB415810-CCB0-46E8-9664-7477DA2C6E9D}.Release|x86.ActiveCfg = Release|Any CPU
 		{DB415810-CCB0-46E8-9664-7477DA2C6E9D}.Release|x86.Build.0 = Release|Any CPU
+		{6FA74C5F-A387-409A-8F5D-5EED9FB705BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FA74C5F-A387-409A-8F5D-5EED9FB705BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FA74C5F-A387-409A-8F5D-5EED9FB705BD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6FA74C5F-A387-409A-8F5D-5EED9FB705BD}.Debug|x64.Build.0 = Debug|Any CPU
+		{6FA74C5F-A387-409A-8F5D-5EED9FB705BD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6FA74C5F-A387-409A-8F5D-5EED9FB705BD}.Debug|x86.Build.0 = Debug|Any CPU
+		{6FA74C5F-A387-409A-8F5D-5EED9FB705BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FA74C5F-A387-409A-8F5D-5EED9FB705BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FA74C5F-A387-409A-8F5D-5EED9FB705BD}.Release|x64.ActiveCfg = Release|Any CPU
+		{6FA74C5F-A387-409A-8F5D-5EED9FB705BD}.Release|x64.Build.0 = Release|Any CPU
+		{6FA74C5F-A387-409A-8F5D-5EED9FB705BD}.Release|x86.ActiveCfg = Release|Any CPU
+		{6FA74C5F-A387-409A-8F5D-5EED9FB705BD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
