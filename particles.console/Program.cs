@@ -10,9 +10,9 @@ namespace particles.console
             var particles = ParticlesFileReader.FromFile(path);
             var collisionSystem = new CollisionSystem(particles);
 
-            for (var millis = 0; ; millis += 500)
+            for (var millis = 0.0; ; millis += 500)
             {
-                collisionSystem.Update(TimeSpan.FromMilliseconds(millis));
+                collisionSystem.Update(millis);
             }
         }
     }

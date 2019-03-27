@@ -32,7 +32,7 @@ namespace particles.monogame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            _collisionSystem.Update(gameTime.ElapsedGameTime);
+            _collisionSystem.Update(gameTime.TotalGameTime.TotalSeconds);
 
             base.Update(gameTime);
         }

@@ -30,8 +30,6 @@ namespace particles
     {
         public int NumCollisions { get; private set; } = 0;
 
-        private static readonly TimeSpan INFINITY = TimeSpan.MaxValue;
-
         public double posX { get; private set; }
         public double posY { get; private set; }
         private double vx, vy; // velocity
@@ -92,64 +90,43 @@ namespace particles
             posY += vy * dt;
         }
 
-        /**
-         * Returns the amount of time for this particle to collide with the specified
-         * particle, assuming no intervening collisions.
-         *
-         * @param  that the other particle
-         * @return the amount of time for this particle to collide with the specified
-         *         particle, assuming no intervening collisions; 
-         *         {@code Double.POSITIVE_INFINITY} if the particles will not collide
-         */
-        public TimeSpan timeToHit(Particle that)
+        /// <summary>
+        /// Time before colliding with given particle, in seconds.
+        /// If no collision, double.PositiveInfinity
+        /// </summary>
+        public double timeToHit(Particle that)
         {
-            if (this == that) return INFINITY;
+            if (this == that) return double.PositiveInfinity;
             double dx = that.posX - this.posX;
             double dy = that.posY - this.posY;
             double dvx = that.vx - this.vx;
             double dvy = that.vy - this.vy;
             double dvdr = dx * dvx + dy * dvy;
-            if (dvdr > 0) return INFINITY;
+            if (dvdr > 0) return double.PositiveInfinity;
             double dvdv = dvx * dvx + dvy * dvy;
-            if (dvdv == 0) return INFINITY;
+            if (dvdv == 0) return double.PositiveInfinity;
             double drdr = dx * dx + dy * dy;
             double sigma = this.radius + that.radius;
             double d = (dvdr * dvdr) - dvdv * (drdr - sigma * sigma);
             // if (drdr < sigma*sigma) StdOut.println("overlapping particles");
-            if (d < 0) return INFINITY;
-            return TimeSpan.FromSeconds(-(dvdr + Math.Sqrt(d)) / dvdv);
+            if (d < 0) return double.PositiveInfinity;
+            return -(dvdr + Math.Sqrt(d)) / dvdv;
         }
 
-        /**
-         * Returns the amount of time for this particle to collide with a vertical
-         * wall, assuming no interening collisions.
-         *
-         * @return the amount of time for this particle to collide with a vertical wall,
-         *         assuming no interening collisions; 
-         *         {@code Double.POSITIVE_INFINITY} if the particle will not collide
-         *         with a vertical wall
-         */
-        public TimeSpan timeToHitVerticalWall()
+        public double timeToHitVerticalWall()
         {
-            if (vx > 0) return TimeSpan.FromSeconds((1.0 - posX - radius) / vx);
-            else if (vx < 0) return TimeSpan.FromSeconds((radius - posX) / vx);
-            else return INFINITY;
+            if (vx > 0) return (1.0 - posX - radius) / vx;
+            if (vx < 0) return (radius - posX) / vx;
+            
+            return double.PositiveInfinity;
         }
 
-        /**
-         * Returns the amount of time for this particle to collide with a horizontal
-         * wall, assuming no interening collisions.
-         *
-         * @return the amount of time for this particle to collide with a horizontal wall,
-         *         assuming no interening collisions; 
-         *         {@code Double.POSITIVE_INFINITY} if the particle will not collide
-         *         with a horizontal wall
-         */
-        public TimeSpan timeToHitHorizontalWall()
+        public double timeToHitHorizontalWall()
         {
-            if (vy > 0) return TimeSpan.FromSeconds((1.0 - posY - radius) / vy);
-            else if (vy < 0) return TimeSpan.FromSeconds((radius - posY) / vy);
-            else return INFINITY;
+            if (vy > 0) return (1.0 - posY - radius) / vy;
+            if (vy < 0) return (radius - posY) / vy;
+            
+            return double.PositiveInfinity;
         }
 
         /**

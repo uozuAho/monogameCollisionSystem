@@ -28,9 +28,9 @@ namespace particles
 
     public class CollisionSystem
     {
-        private MinPQ<Event> _pq; // the priority queue
+        private MinPQ<Event> _pq;
         public Particle[] Particles { get; private set; }
-        private TimeSpan _lastEventTime = TimeSpan.Zero;
+        private double _lastEventTimeS = 0;
 
         /**
          * Initializes a system with the specified collection of particles.
@@ -53,11 +53,10 @@ namespace particles
             }
         }
         
-        public void Update(TimeSpan now)
+        public void Update(double nowSeconds)
         {
-            // todo: this assumes particle time is in seconds (looks like it)
             // handle all events up to current time
-            while (_pq.Peek().time <= now)
+            while (_pq.Peek().time <= nowSeconds)
             {
                 var event_ = _pq.Pop();
                 if (!event_.isValid()) continue;
@@ -68,10 +67,10 @@ namespace particles
                 // update all particles to current time
                 foreach (var p in Particles)
                 {
-                    p.move((event_.time - _lastEventTime).TotalSeconds);
+                    p.move(event_.time - _lastEventTimeS);
                 }
 
-                _lastEventTime = event_.time;
+                _lastEventTimeS = event_.time;
 
                 if (a != null && b != null) a.bounceOff(b);
                 else if (a != null) a.bounceOffVerticalWall();
@@ -92,14 +91,14 @@ namespace particles
             foreach (var p in Particles)
             {
                 var dt = a.timeToHit(p);
-                _pq.Push(new Event(_lastEventTime + dt, a, p));
+                _pq.Push(new Event(_lastEventTimeS + dt, a, p));
             }
 
             // particle-wall collisions
             var dtX = a.timeToHitVerticalWall();
             var dtY = a.timeToHitHorizontalWall();
-            _pq.Push(new Event(_lastEventTime + dtX, a, null));
-            _pq.Push(new Event(_lastEventTime + dtY, null, a));
+            _pq.Push(new Event(_lastEventTimeS + dtX, a, null));
+            _pq.Push(new Event(_lastEventTimeS + dtY, null, a));
         }
 
         private class EventComparer : IComparer<Event>
@@ -122,14 +121,14 @@ namespace particles
         /// </remarks>
         private class Event : IComparable<Event>
         {
-            public readonly TimeSpan time; // time that event is scheduled to occur
+            public readonly double time; // time that event is scheduled to occur
             public readonly Particle a, b; // particles involved in event, possibly null
             public readonly int countA, countB; // collision counts at event creation
 
             // create a new event to occur at time t involving a and b
-            public Event(TimeSpan t, Particle a, Particle b)
+            public Event(double t, Particle a, Particle b)
             {
-                this.time = t;
+                time = t;
                 this.a = a;
                 this.b = b;
                 if (a != null) countA = a.NumCollisions;
