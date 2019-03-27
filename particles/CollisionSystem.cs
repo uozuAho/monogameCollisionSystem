@@ -28,9 +28,9 @@ namespace particles
 
     public class CollisionSystem
     {
-        private MinPQ<Event> _pq;
-        public Particle[] Particles { get; private set; }
-        private double _lastEventTimeS = 0;
+        private readonly MinPQ<Event> _pq;
+        public Particle[] Particles { get; }
+        private double _lastUpdateTime = 0;
 
         /**
          * Initializes a system with the specified collection of particles.
@@ -55,6 +55,11 @@ namespace particles
         
         public void Update(double nowSeconds)
         {
+            if (_pq.Peek().time > nowSeconds)
+            {
+                UpdateAllParticles(nowSeconds);
+            }
+
             // handle all events up to current time
             while (_pq.Peek().time <= nowSeconds)
             {
@@ -64,13 +69,7 @@ namespace particles
                 var a = event_.a;
                 var b = event_.b;
 
-                // update all particles to current time
-                foreach (var p in Particles)
-                {
-                    p.move(event_.time - _lastEventTimeS);
-                }
-
-                _lastEventTimeS = event_.time;
+                UpdateAllParticles(event_.time);
 
                 if (a != null && b != null) a.bounceOff(b);
                 else if (a != null) a.bounceOffVerticalWall();
@@ -82,6 +81,16 @@ namespace particles
             }
         }
 
+        private void UpdateAllParticles(double nowSeconds)
+        {
+            foreach (var p in Particles)
+            {
+                p.move(nowSeconds - _lastUpdateTime);
+            }
+
+            _lastUpdateTime = nowSeconds;
+        }
+
         // updates priority queue with all new events for particle a
         private void predict(Particle a)
         {
@@ -91,14 +100,14 @@ namespace particles
             foreach (var p in Particles)
             {
                 var dt = a.timeToHit(p);
-                _pq.Push(new Event(_lastEventTimeS + dt, a, p));
+                _pq.Push(new Event(_lastUpdateTime + dt, a, p));
             }
 
             // particle-wall collisions
             var dtX = a.timeToHitVerticalWall();
             var dtY = a.timeToHitHorizontalWall();
-            _pq.Push(new Event(_lastEventTimeS + dtX, a, null));
-            _pq.Push(new Event(_lastEventTimeS + dtY, null, a));
+            _pq.Push(new Event(_lastUpdateTime + dtX, a, null));
+            _pq.Push(new Event(_lastUpdateTime + dtY, null, a));
         }
 
         private class EventComparer : IComparer<Event>
