@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 // copied from cs ai
 
-namespace particles
+namespace particles.monogame
 {
     /// <summary>
     /// Standard binary 'min' heap. Smallest items (based on comparer) float to the top.

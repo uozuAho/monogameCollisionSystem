@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "particles", "particles\particles.csproj", "{4A9A2677-DE77-40C5-BB3A-FBED12C32785}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "particles.monogame", "particles.monogame\particles.monogame.csproj", "{4A9A2677-DE77-40C5-BB3A-FBED12C32785}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "particles.test", "particles.test\particles.test.csproj", "{DB415810-CCB0-46E8-9664-7477DA2C6E9D}"
 EndProject

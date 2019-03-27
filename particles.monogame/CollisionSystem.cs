@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace particles
+namespace particles.monogame
 {
  /******************************************************************************
   *
@@ -31,8 +30,6 @@ namespace particles
 
     public class CollisionSystem
     {
-        private const double HZ = 0.5; // number of redraw events per clock tick
-
         private MinPQ<Event> _pq; // the priority queue
         private Particle[] particles; // the array of particles
         private TimeSpan _lastEventTime = TimeSpan.Zero;
@@ -88,8 +85,6 @@ namespace particles
                 // update the priority queue with new collisions involving a or b
                 predict(a);
                 predict(b);
-                
-//                Console.WriteLine(now.ElapsedGameTime.TotalSeconds);
             }
         }
 
@@ -150,9 +145,9 @@ namespace particles
                 this.time = t;
                 this.a = a;
                 this.b = b;
-                if (a != null) countA = a.count;
+                if (a != null) countA = a.NumCollisions;
                 else countA = -1;
-                if (b != null) countB = b.count;
+                if (b != null) countB = b.NumCollisions;
                 else countB = -1;
             }
 
@@ -165,8 +160,8 @@ namespace particles
             // has any collision occurred between when event was created and now?
             public bool isValid()
             {
-                if (a != null && a.count != countA) return false;
-                if (b != null && b.count != countB) return false;
+                if (a != null && a.NumCollisions != countA) return false;
+                if (b != null && b.NumCollisions != countB) return false;
                 return true;
             }
         }

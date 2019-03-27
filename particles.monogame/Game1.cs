@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace particles
+namespace particles.monogame
 {
     public class Game1 : Game
     {

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
-using Microsoft.Xna.Framework;
 
-namespace particles
+namespace particles.monogame
 {
     public static class Program
     {

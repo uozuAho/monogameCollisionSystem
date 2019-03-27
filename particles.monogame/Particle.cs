@@ -30,17 +30,7 @@ namespace particles
  */
     public class Particle
     {
-        /**
-         * Returns the number of collisions involving this particle with
-         * vertical walls, horizontal walls, or other particles.
-         * This is equal to the number of calls to {@link #bounceOff},
-         * {@link #bounceOffVerticalWall}, and
-         * {@link #bounceOffHorizontalWall}.
-         *
-         * @return the number of collisions involving this particle with
-         *         vertical walls, horizontal walls, or other particles
-         */
-        public int count { get; private set; }
+        public int NumCollisions { get; private set; } = 0;
 
         private static readonly TimeSpan INFINITY = TimeSpan.MaxValue;
 
@@ -50,7 +40,6 @@ namespace particles
         private readonly double radius; // radius
         private readonly double mass; // mass
         private readonly Color color; // color
-
 
         /**
          * Initializes a particle with the specified position, velocity, radius, mass, and color.
@@ -202,8 +191,8 @@ namespace particles
             that.vy -= fy / that.mass;
 
             // update collision counts
-            this.count++;
-            that.count++;
+            this.NumCollisions++;
+            that.NumCollisions++;
         }
 
         /**
@@ -214,7 +203,7 @@ namespace particles
         public void bounceOffVerticalWall()
         {
             vx = -vx;
-            count++;
+            NumCollisions++;
         }
 
         /**
@@ -225,7 +214,7 @@ namespace particles
         public void bounceOffHorizontalWall()
         {
             vy = -vy;
-            count++;
+            NumCollisions++;
         }
 
         /**

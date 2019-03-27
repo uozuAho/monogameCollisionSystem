@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\particles\particles.csproj" />
+    <ProjectReference Include="..\particles.monogame\particles.monogame.csproj" />
   </ItemGroup>
 
 </Project>

@@ -10,7 +10,7 @@ namespace particles.test
         }
 
         [Test]
-        public void Test1()
+        public void ShouldMoveAtXSpeed()
         {
             const int xSpeed = 1;
             var particle = new Particle(0, 0, xSpeed, 0, .1, .1);
