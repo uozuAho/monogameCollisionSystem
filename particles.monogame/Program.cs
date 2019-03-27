@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -9,26 +10,34 @@ namespace particles.monogame
         [STAThread]
         static void Main(string[] args)
         {
-            Console.WriteLine(string.Join(",", args));
+//            var particles = LoadParticlesFromFile(args[0]);
+            var particles = GenerateParticles(300);
+            var collisionSystem = new CollisionSystem(particles);
             
-            var collisionSystem = InitCollisionSystem(args);
-            
-            Console.WriteLine("starting game");
             using (var game = new Game1(collisionSystem))
                 game.Run();
         }
 
-        private static CollisionSystem InitCollisionSystem(string[] args)
+        private static IEnumerable<Particle> LoadParticlesFromFile(string path)
         {
-            var particles = GetParticlesFromArgs(args);
-            
-            return new CollisionSystem(particles);
+            return ParticlesFileReader.FromFile(path);
         }
 
-        private static Particle[] GetParticlesFromArgs(string[] args)
+        private static IEnumerable<Particle> GenerateParticles(int numParticles)
         {
-            var path = args[0];
-            return ParticlesFileReader.FromFile(path).ToArray();
+            var rng = new Random();
+            
+            for (var i = 0; i < numParticles; i++)
+            {
+                yield return new Particle(
+                    rng.NextDouble(),
+                    rng.NextDouble(),
+                    rng.NextDouble() * 0.5,
+                    rng.NextDouble() * 0.5,
+                    .01,
+                    1
+                );
+            }
         }
     }
 }
