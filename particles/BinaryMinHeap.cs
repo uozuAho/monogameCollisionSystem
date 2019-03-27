@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 // copied from cs ai
 
-namespace particles.monogame
+namespace particles
 {
     /// <summary>
     /// Standard binary 'min' heap. Smallest items (based on comparer) float to the top.
     /// </summary>
-    public class BinaryMinHeap<T>
+    internal class BinaryMinHeap<T>
     {
         public int Size => _buf.Count;
 

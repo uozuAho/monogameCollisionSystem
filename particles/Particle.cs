@@ -1,6 +1,4 @@
 using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace particles
 {
@@ -39,7 +37,6 @@ namespace particles
         private double vx, vy; // velocity
         private readonly double radius; // radius
         private readonly double mass; // mass
-        private readonly Color color; // color
 
         /**
          * Initializes a particle with the specified position, velocity, radius, mass, and color.
@@ -60,7 +57,6 @@ namespace particles
             this.posY = posY;
             this.radius = radius;
             this.mass = mass;
-            this.color = Color.Red;
         }
 
         public Particle Clone()
@@ -94,11 +90,6 @@ namespace particles
         {
             posX += vx * dt;
             posY += vy * dt;
-        }
-
-        public void Draw(SpriteBatch spriteBatch, Texture2D texture2D)
-        {
-            spriteBatch.Draw(texture2D, new Rectangle((int)posX, (int)posY, 20, 20), Color.Red);
         }
 
         /**

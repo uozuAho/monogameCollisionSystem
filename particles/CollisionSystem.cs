@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
-namespace particles.monogame
+namespace particles
 {
  /******************************************************************************
   *
@@ -31,9 +29,8 @@ namespace particles.monogame
     public class CollisionSystem
     {
         private MinPQ<Event> _pq; // the priority queue
-        private Particle[] particles; // the array of particles
+        public Particle[] particles; // the array of particles
         private TimeSpan _lastEventTime = TimeSpan.Zero;
-        private Texture2D _particleTexture;
 
         /**
          * Initializes a system with the specified collection of particles.
@@ -46,10 +43,8 @@ namespace particles.monogame
             this.particles = particles.Select(p => p.Clone()).ToArray(); // defensive copy
         }
 
-        public void Init(Texture2D particleTexture)
+        public void Init()
         {
-            _particleTexture = particleTexture;
-            
             // initialize PQ with collision events
             _pq = new MinPQ<Event>(new EventComparer());
             foreach (var p in particles)
@@ -58,11 +53,11 @@ namespace particles.monogame
             }
         }
         
-        public void Update(GameTime now)
+        public void Update(TimeSpan now)
         {
             // todo: this assumes particle time is in seconds (looks like it)
             // handle all events up to current time
-            while (_pq.Peek().time <= now.ElapsedGameTime)
+            while (_pq.Peek().time <= now)
             {
                 var event_ = _pq.Pop();
                 if (!event_.isValid()) continue;
@@ -85,14 +80,6 @@ namespace particles.monogame
                 // update the priority queue with new collisions involving a or b
                 predict(a);
                 predict(b);
-            }
-        }
-
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            foreach (var particle in particles)
-            {
-                particle.Draw(spriteBatch, _particleTexture);
             }
         }
 

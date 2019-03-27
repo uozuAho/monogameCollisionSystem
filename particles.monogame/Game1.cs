@@ -9,6 +9,7 @@ namespace particles.monogame
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         private readonly CollisionSystem _collisionSystem;
+        private CollisionSystemRenderer _collisionSystemRenderer;
 
         public Game1(CollisionSystem collisionSystem)
         {
@@ -23,7 +24,8 @@ namespace particles.monogame
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             var particleTexture = Content.Load<Texture2D>("dot_20x20");
-            _collisionSystem.Init(particleTexture);
+            _collisionSystem.Init();
+            _collisionSystemRenderer = new CollisionSystemRenderer(_collisionSystem, particleTexture);
         }
 
         protected override void Update(GameTime gameTime)
@@ -31,7 +33,7 @@ namespace particles.monogame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            _collisionSystem.Update(gameTime);
+            _collisionSystem.Update(gameTime.ElapsedGameTime);
 
             base.Update(gameTime);
         }
@@ -41,7 +43,7 @@ namespace particles.monogame
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
-            _collisionSystem.Draw(spriteBatch);
+            _collisionSystemRenderer.Draw(spriteBatch);
             spriteBatch.End();
 
             base.Draw(gameTime);

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 // copied from cs ai
 
-namespace particles.monogame
+namespace particles
 {
     /// <summary>
     /// Min priority queue
