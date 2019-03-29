@@ -44,8 +44,8 @@ namespace particles
         {
             Particles = particles.ToArray();
             var maxNumEvents = Particles.Length * Particles.Length * 10;
-            _eventQueue = new MinPQ<CollisionEvent>(new EventTimeComparer(), maxNumEvents);
-            _collisionEventSource = new CollisionEventSource(maxNumEvents);
+            _eventQueue = new MinPQ<CollisionEvent>(new EventTimeComparer());
+            _collisionEventSource = new CollisionEventSource();
             PredictAllParticles();
         }
 
