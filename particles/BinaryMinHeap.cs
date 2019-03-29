@@ -25,12 +25,13 @@ namespace particles
         /// </param>
         public BinaryMinHeap(IComparer<T> comparer, int keepMinNItems = -1)
         {
-            _buf = new List<T>();
             _comparer = comparer;
 
             // This sets the max depth of the heap. Anything below this depth
             // can be discarded without worrying about discarding one of the min N items
             _maxSize = keepMinNItems == -1 ? -1 : NextPowerOf2(keepMinNItems) - 1;
+            
+            _buf = _maxSize > 0 ? new List<T>(_maxSize) : new List<T>();
         }
 
         /// <summary>

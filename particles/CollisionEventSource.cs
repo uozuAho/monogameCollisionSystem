@@ -6,6 +6,17 @@ namespace particles
     {
         private readonly List<CollisionEvent> _availableEvents = new List<CollisionEvent>();
 
+        public CollisionEventSource(int preSize = 0)
+        {
+            if (preSize <= 0) return;
+
+            _availableEvents = new List<CollisionEvent>(preSize);
+            for (var i = 0; i < preSize; i++)
+            {
+                _availableEvents.Add(NewEvent(0, null, null));
+            }
+        }
+
         public CollisionEvent NewEvent(double timeSeconds, Particle a, Particle b)
         {
             if (_availableEvents.Count == 0) return new CollisionEvent(timeSeconds, a, b);
