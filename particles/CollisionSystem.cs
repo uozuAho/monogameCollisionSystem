@@ -60,11 +60,13 @@ namespace particles
         public void Update(double nowSeconds)
         {
             if (_eventQueue.Peek().Time > nowSeconds)
-            {
-                UpdateAllParticles(nowSeconds);
-            }
+                MoveAllParticles(nowSeconds);
 
-            // handle all events up to current time
+            ProcessEvents(nowSeconds);
+        }
+
+        private void ProcessEvents(double nowSeconds)
+        {
             while (_eventQueue.Peek().Time <= nowSeconds)
             {
                 var event_ = _eventQueue.Pop();
@@ -77,12 +79,12 @@ namespace particles
                 var a = event_.A;
                 var b = event_.B;
 
-                UpdateAllParticles(event_.Time);
+                MoveAllParticles(event_.Time);
 
                 if (a != null && b != null) a.bounceOff(b);
                 else if (a != null) a.bounceOffVerticalWall();
                 else if (b != null) b.bounceOffHorizontalWall();
-    
+
                 EnqueueCollisionTimes(a);
                 EnqueueCollisionTimes(b);
 
@@ -90,7 +92,7 @@ namespace particles
             }
         }
 
-        private void UpdateAllParticles(double nowSeconds)
+        private void MoveAllParticles(double nowSeconds)
         {
             foreach (var p in Particles)
             {
