@@ -28,8 +28,10 @@ namespace particles
 
     public class CollisionSystem
     {
-        private readonly MinPQ<CollisionEvent> _pq;
         public Particle[] Particles { get; }
+
+        private readonly MinPQ<CollisionEvent> _pq;
+        private CollisionEventSource _collisionEventSource;
         private double _lastUpdateTime;
 
         /**
@@ -42,6 +44,7 @@ namespace particles
         {
             Particles = particles.ToArray();
             _pq = new MinPQ<CollisionEvent>(new EventTimeComparer());
+            _collisionEventSource = new CollisionEventSource();
             PredictAllParticles();
         }
 
@@ -64,7 +67,11 @@ namespace particles
             while (_pq.Peek().Time <= nowSeconds)
             {
                 var event_ = _pq.Pop();
-                if (!event_.IsValid()) continue;
+                if (!event_.IsValid())
+                {
+                    _collisionEventSource.Reclaim(event_);
+                    continue;
+                }
 
                 var a = event_.A;
                 var b = event_.B;
@@ -77,6 +84,8 @@ namespace particles
     
                 EnqueueCollisionTimes(a);
                 EnqueueCollisionTimes(b);
+
+                _collisionEventSource.Reclaim(event_);
             }
         }
 
@@ -98,14 +107,14 @@ namespace particles
             foreach (var p in Particles)
             {
                 var dt = a.timeToHit(p);
-                _pq.Push(new CollisionEvent(_lastUpdateTime + dt, a, p));
+                _pq.Push(_collisionEventSource.NewEvent(_lastUpdateTime + dt, a, p));
             }
 
             // particle-wall collisions
             var dtX = a.timeToHitVerticalWall();
             var dtY = a.timeToHitHorizontalWall();
-            _pq.Push(new CollisionEvent(_lastUpdateTime + dtX, a, null));
-            _pq.Push(new CollisionEvent(_lastUpdateTime + dtY, null, a));
+            _pq.Push(_collisionEventSource.NewEvent(_lastUpdateTime + dtX, a, null));
+            _pq.Push(_collisionEventSource.NewEvent(_lastUpdateTime + dtY, null, a));
         }
 
         private class EventTimeComparer : IComparer<CollisionEvent>

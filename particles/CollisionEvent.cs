@@ -1,4 +1,6 @@
-﻿namespace particles
+﻿using System.Resources;
+
+namespace particles
 {
     /// <summary>
     /// An event during a particle collision simulation. Each event contains
@@ -12,12 +14,18 @@
     /// </remarks>
     internal class CollisionEvent
     {
-        public readonly double Time;
-        public readonly Particle A, B;
-        private readonly int _countA; // collision counts at event creation
-        private readonly int _countB; // collision counts at event creation
+        public double Time { get; private set; }
+        public Particle A { get; private set; }
+        public Particle B { get; private set; }
+        private int _countA; // collision counts at event creation
+        private int _countB; // collision counts at event creation
 
         public CollisionEvent(double timeSeconds, Particle a, Particle b)
+        {
+            Init(timeSeconds, a, b);
+        }
+
+        public void Init(double timeSeconds, Particle a, Particle b)
         {
             Time = timeSeconds;
             A = a;
