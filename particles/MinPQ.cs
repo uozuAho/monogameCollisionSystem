@@ -11,16 +11,16 @@ namespace particles
     {
         private readonly BinaryMinHeap<T> _minHeap;
 
-        public MinPQ(IComparer<T> comparer)
+        public MinPQ(IComparer<T> comparer, int keepMinNItems = -1)
         {
-            _minHeap = new BinaryMinHeap<T>(comparer);
+            _minHeap = new BinaryMinHeap<T>(comparer, keepMinNItems);
         }
 
         public bool IsEmpty => _minHeap.Size == 0;
 
-        public void Push(T item)
+        public T Push(T item)
         {
-            _minHeap.Add(item);
+            return _minHeap.Add(item);
         }
 
         public T Pop()

@@ -8,23 +8,43 @@ namespace particles
     /// <summary>
     /// Standard binary 'min' heap. Smallest items (based on comparer) float to the top.
     /// </summary>
-    internal class BinaryMinHeap<T>
+    public class BinaryMinHeap<T>
     {
         public int Size => _buf.Count;
 
         private readonly List<T> _buf;
         private readonly IComparer<T> _comparer;
+        private readonly int _maxSize;
 
-        public BinaryMinHeap(IComparer<T> comparer)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="comparer"></param>
+        /// <param name="keepMinNItems">
+        /// Optional: Limit memory usage while ensuring the min N items can fit in the heap
+        /// </param>
+        public BinaryMinHeap(IComparer<T> comparer, int keepMinNItems = -1)
         {
             _buf = new List<T>();
             _comparer = comparer;
+
+            // This sets the max depth of the heap. Anything below this depth
+            // can be discarded without worrying about discarding one of the min N items
+            _maxSize = keepMinNItems == -1 ? -1 : NextPowerOf2(keepMinNItems) - 1;
         }
 
-        public void Add(T item)
+        /// <summary>
+        /// Add item to the heap. If an item is discarded due to memory limits, it returned.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>An item discarded from the heap, or default</returns>
+        public T Add(T item)
         {
             _buf.Add(item);
             Swim(Size - 1);
+            if (_maxSize > 0 && Size > _maxSize)
+                return RemoveAtIdx(Size - 1);
+            return default(T);
         }
 
         public void Remove(T item)
@@ -139,6 +159,13 @@ namespace particles
             var temp = _buf[idxA];
             _buf[idxA] = _buf[idxB];
             _buf[idxB] = temp;
+        }
+
+        private static int NextPowerOf2(int num)
+        {
+            var nextPower = 1;
+            while (nextPower <= num) nextPower *= 2;
+            return nextPower;
         }
     }
 }

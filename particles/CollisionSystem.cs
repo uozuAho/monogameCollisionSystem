@@ -30,8 +30,8 @@ namespace particles
     {
         public Particle[] Particles { get; }
 
-        private readonly MinPQ<CollisionEvent> _pq;
-        private CollisionEventSource _collisionEventSource;
+        private readonly MinPQ<CollisionEvent> _eventQueue;
+        private readonly CollisionEventSource _collisionEventSource;
         private double _lastUpdateTime;
 
         /**
@@ -43,7 +43,8 @@ namespace particles
         public CollisionSystem(IEnumerable<Particle> particles)
         {
             Particles = particles.ToArray();
-            _pq = new MinPQ<CollisionEvent>(new EventTimeComparer());
+            var maxNumEvents = Particles.Length * Particles.Length * 10;
+            _eventQueue = new MinPQ<CollisionEvent>(new EventTimeComparer(), maxNumEvents);
             _collisionEventSource = new CollisionEventSource();
             PredictAllParticles();
         }
@@ -58,15 +59,15 @@ namespace particles
         
         public void Update(double nowSeconds)
         {
-            if (_pq.Peek().Time > nowSeconds)
+            if (_eventQueue.Peek().Time > nowSeconds)
             {
                 UpdateAllParticles(nowSeconds);
             }
 
             // handle all events up to current time
-            while (_pq.Peek().Time <= nowSeconds)
+            while (_eventQueue.Peek().Time <= nowSeconds)
             {
-                var event_ = _pq.Pop();
+                var event_ = _eventQueue.Pop();
                 if (!event_.IsValid())
                 {
                     _collisionEventSource.Reclaim(event_);
@@ -107,14 +108,21 @@ namespace particles
             foreach (var p in Particles)
             {
                 var dt = a.timeToHit(p);
-                _pq.Push(_collisionEventSource.NewEvent(_lastUpdateTime + dt, a, p));
+                Enqueue(_collisionEventSource.NewEvent(_lastUpdateTime + dt, a, p));
             }
 
             // particle-wall collisions
             var dtX = a.timeToHitVerticalWall();
             var dtY = a.timeToHitHorizontalWall();
-            _pq.Push(_collisionEventSource.NewEvent(_lastUpdateTime + dtX, a, null));
-            _pq.Push(_collisionEventSource.NewEvent(_lastUpdateTime + dtY, null, a));
+            Enqueue(_collisionEventSource.NewEvent(_lastUpdateTime + dtX, a, null));
+            Enqueue(_collisionEventSource.NewEvent(_lastUpdateTime + dtY, null, a));
+        }
+
+        private void Enqueue(CollisionEvent event_)
+        {
+            var discardedEvent = _eventQueue.Push(event_);
+            if (discardedEvent != null)
+                _collisionEventSource.Reclaim(discardedEvent);
         }
 
         private class EventTimeComparer : IComparer<CollisionEvent>
