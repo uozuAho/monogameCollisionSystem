@@ -14,6 +14,10 @@ namespace particles.monogame
         private CollisionSystemRenderer _collisionSystemRenderer;
         private readonly TimerMetric _updateMetric = new TimerMetric();
         private readonly TimerMetric _drawMetric = new TimerMetric();
+        private readonly FpsMetric _fpsMetric = new FpsMetric();
+        private TimerMetricRenderer _updateMetricRenderer;
+        private TimerMetricRenderer _drawMetricRenderer;
+        private FpsMetricRenderer _fpsMetricRenderer;
 
         public Game1(CollisionSystem collisionSystem)
         {
@@ -29,6 +33,9 @@ namespace particles.monogame
             spriteBatch = new SpriteBatch(GraphicsDevice);
             var particleTexture = Content.Load<Texture2D>("dot_20x20");
             _metricFont = Content.Load<SpriteFont>("metric");
+            _updateMetricRenderer = new TimerMetricRenderer(_metricFont, "update", new Vector2(0, 0));
+            _drawMetricRenderer = new TimerMetricRenderer(_metricFont, "draw", new Vector2(0, 20));
+            _fpsMetricRenderer = new FpsMetricRenderer(_metricFont, new Vector2(0, 40));
             _collisionSystemRenderer = new CollisionSystemRenderer(_collisionSystem, particleTexture);
         }
 
@@ -49,17 +56,69 @@ namespace particles.monogame
         protected override void Draw(GameTime gameTime)
         {
             _drawMetric.Begin();
+            _fpsMetric.OnFrame();
 
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
             _collisionSystemRenderer.Draw(spriteBatch);
-            spriteBatch.DrawString(_metricFont, "hello!", new Vector2(100, 100), Color.Black);
+            _updateMetricRenderer.Draw(spriteBatch, _updateMetric);
+            _drawMetricRenderer.Draw(spriteBatch, _drawMetric);
+            _fpsMetricRenderer.Draw(spriteBatch, _fpsMetric);
             spriteBatch.End();
 
             base.Draw(gameTime);
 
             _drawMetric.End();
+        }
+    }
+
+    internal class FpsMetric
+    {
+        private readonly long[] _frameTimes = new long[100];
+        private readonly Stopwatch _stopwatch;
+        private int _idx = 0;
+
+        public FpsMetric()
+        {
+            _stopwatch = Stopwatch.StartNew();
+        }
+
+        public void OnFrame()
+        {
+            _frameTimes[_idx++] = _stopwatch.ElapsedMilliseconds;
+            if (_idx == _frameTimes.Length)
+                _idx = 0;
+        }
+
+        public double Fps()
+        {
+            var latestIdx = _idx - 1;
+            if (latestIdx < 0) latestIdx = _frameTimes.Length - 1;
+
+            var totalTimeMs = _frameTimes[latestIdx] - _frameTimes[_idx];
+
+            if (totalTimeMs < double.Epsilon) return 0;
+
+            return (_frameTimes.Length * 1000.0) / totalTimeMs;
+        }
+    }
+
+    internal class FpsMetricRenderer
+    {
+        private readonly SpriteFont _font;
+        private readonly Vector2 _pos;
+
+        public FpsMetricRenderer(SpriteFont font, Vector2 pos)
+        {
+            _font = font;
+            _pos = pos;
+        }
+
+        public void Draw(SpriteBatch spriteBatch, FpsMetric metric)
+        {
+            var fps = metric.Fps();
+            spriteBatch.DrawString(_font, $"fps: {fps:0.##}", _pos, Color.Red);
         }
     }
 
@@ -102,6 +161,26 @@ namespace particles.monogame
             }
 
             return (min, max, sum / _measurements.Length);
+        }
+    }
+
+    internal class TimerMetricRenderer
+    {
+        private readonly SpriteFont _font;
+        private readonly string _label;
+        private readonly Vector2 _pos;
+
+        public TimerMetricRenderer(SpriteFont font, string label, Vector2 pos)
+        {
+            _font = font;
+            _label = label;
+            _pos = pos;
+        }
+
+        public void Draw(SpriteBatch spriteBatch, TimerMetric metric)
+        {
+            var (min, max, avg) = metric.MinMaxAvg();
+            spriteBatch.DrawString(_font, $"{_label}: {min}, {max}, {avg}", _pos, Color.Red);
         }
     }
 }
