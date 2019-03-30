@@ -13,14 +13,14 @@ namespace particles
         private readonly IComparer<T> _comparer;
         private readonly int _maxSize;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="comparer"></param>
-        /// <param name="keepMinNItems">
-        /// Optional: Limit memory usage while ensuring the min N items can fit in the heap
-        /// </param>
-        public BinaryMinHeap(IComparer<T> comparer, int keepMinNItems = -1)
+        public BinaryMinHeap(IComparer<T> comparer) : this(comparer, -1, 1) {}
+
+        public static BinaryMinHeap<T> CreateAndPreSize(IComparer<T> comparer, int preSize)
+        {
+            return new BinaryMinHeap<T>(comparer, preSize);
+        }
+
+        private BinaryMinHeap(IComparer<T> comparer, int preSize = -1, int keepMinNItems = -1)
         {
             _comparer = comparer;
 
@@ -28,7 +28,7 @@ namespace particles
             // can be discarded without worrying about discarding one of the min N items
             _maxSize = keepMinNItems == -1 ? -1 : NextPowerOf2(keepMinNItems) - 1;
             
-            _buf = _maxSize > 0 ? new List<T>(_maxSize) : new List<T>();
+            _buf = preSize > 0 ? new List<T>(preSize) : new List<T>();
         }
 
         /// <summary>

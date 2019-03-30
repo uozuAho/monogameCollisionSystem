@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -43,9 +42,10 @@ namespace particles
         public CollisionSystem(IEnumerable<Particle> particles)
         {
             Particles = particles.ToArray();
-            var maxNumEvents = Particles.Length * Particles.Length * 10;
-            _eventHeap = new BinaryMinHeap<CollisionEvent>(new EventTimeComparer());
-            _collisionEventSource = new CollisionEventSource();
+            var preFillArraySize = Particles.Length * Particles.Length * 100;
+            _eventHeap = BinaryMinHeap<CollisionEvent>.CreateAndPreSize(
+                new EventTimeComparer(), preFillArraySize);
+            _collisionEventSource = new CollisionEventSource(preFillArraySize);
             PredictAllParticles();
         }
 

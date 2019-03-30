@@ -13,7 +13,7 @@ namespace particles
             _availableEvents = new List<CollisionEvent>(preSize);
             for (var i = 0; i < preSize; i++)
             {
-                _availableEvents.Add(NewEvent(0, null, null));
+                _availableEvents.Add(new CollisionEvent(0, null, null));
             }
         }
 
