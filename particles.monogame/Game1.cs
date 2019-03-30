@@ -9,6 +9,7 @@ namespace particles.monogame
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        private SpriteFont _metricFont;
         private readonly CollisionSystem _collisionSystem;
         private CollisionSystemRenderer _collisionSystemRenderer;
         private readonly TimerMetric _updateMetric = new TimerMetric();
@@ -27,6 +28,7 @@ namespace particles.monogame
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             var particleTexture = Content.Load<Texture2D>("dot_20x20");
+            _metricFont = Content.Load<SpriteFont>("metric");
             _collisionSystemRenderer = new CollisionSystemRenderer(_collisionSystem, particleTexture);
         }
 
@@ -52,10 +54,8 @@ namespace particles.monogame
 
             spriteBatch.Begin();
             _collisionSystemRenderer.Draw(spriteBatch);
-            spriteBatch.DrawString();
+            spriteBatch.DrawString(_metricFont, "hello!", new Vector2(100, 100), Color.Black);
             spriteBatch.End();
-
-
 
             base.Draw(gameTime);
 
