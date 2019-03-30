@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-
-// copied from cs ai
 
 namespace particles
 {
@@ -48,38 +45,18 @@ namespace particles
             return default(T);
         }
 
-        public void Remove(T item)
-        {
-            if (Size == 0) throw new InvalidOperationException("cannot remove from empty");
-
-            var idx = IndexOf(item, 0);
-
-            if (idx == -1) throw new InvalidOperationException("cannot remove item not in heap");
-
-            RemoveAtIdx(idx);
-        }
-
-        public bool Contains(T item)
-        {
-            return IndexOf(item, 0) >= 0;
-        }
-
         public T RemoveMin()
         {
-            if (Size == 0) throw new InvalidOperationException("cannot remove from empty");
             return RemoveAtIdx(0);
         }
 
         public T PeekMin()
         {
-            if (Size == 0) throw new InvalidOperationException("cannot peek when empty");
             return _buf[0];
         }
 
         private T RemoveAtIdx(int idx)
         {
-            if (idx >= Size) throw new ArgumentOutOfRangeException();
-
             // swap item at idx and last item
             var temp = _buf[idx];
             var lastIdx = Size - 1;
@@ -88,28 +65,6 @@ namespace particles
             // sink last item placed at idx
             Sink(idx);
             return temp;
-        }
-
-        private int IndexOf(T item, int subRoot)
-        {
-            if (subRoot >= Size) {
-                // gone past leaf
-                return -1;
-            }
-            if (_comparer.Compare(item, _buf[subRoot]) == -1)
-            {
-                // item is less than current node - will not be in this subtree
-                return -1;
-            }
-            if (item.Equals(_buf[subRoot]))
-            {
-                return subRoot;
-            }
-
-            var idx = IndexOf(item, subRoot * 2 + 1);
-            return idx >= 0
-                ? idx
-                : IndexOf(item, subRoot * 2 + 2);
         }
 
         private void Swim(int idx)

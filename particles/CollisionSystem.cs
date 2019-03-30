@@ -30,7 +30,7 @@ namespace particles
     {
         public Particle[] Particles { get; }
 
-        private readonly MinPQ<CollisionEvent> _eventQueue;
+        private readonly BinaryMinHeap<CollisionEvent> _eventHeap;
         private readonly CollisionEventSource _collisionEventSource;
         private double _lastUpdateTime;
 
@@ -44,7 +44,7 @@ namespace particles
         {
             Particles = particles.ToArray();
             var maxNumEvents = Particles.Length * Particles.Length * 10;
-            _eventQueue = new MinPQ<CollisionEvent>(new EventTimeComparer());
+            _eventHeap = new BinaryMinHeap<CollisionEvent>(new EventTimeComparer());
             _collisionEventSource = new CollisionEventSource();
             PredictAllParticles();
         }
@@ -59,7 +59,7 @@ namespace particles
         
         public void Update(double nowSeconds)
         {
-            if (_eventQueue.Peek().Time > nowSeconds)
+            if (_eventHeap.PeekMin().Time > nowSeconds)
                 MoveAllParticles(nowSeconds);
 
             ProcessEvents(nowSeconds);
@@ -67,9 +67,9 @@ namespace particles
 
         private void ProcessEvents(double nowSeconds)
         {
-            while (_eventQueue.Peek().Time <= nowSeconds)
+            while (_eventHeap.PeekMin().Time <= nowSeconds)
             {
-                var event_ = _eventQueue.Pop();
+                var event_ = _eventHeap.RemoveMin();
                 if (!event_.IsValid())
                 {
                     _collisionEventSource.Reclaim(event_);
@@ -107,8 +107,9 @@ namespace particles
             if (a == null) return;
 
             // particle-particle collisions
-            foreach (var p in Particles)
+            for (var i = 0; i < Particles.Length; i++)
             {
+                var p = Particles[i];
                 var dt = a.timeToHit(p);
                 Enqueue(_collisionEventSource.NewEvent(_lastUpdateTime + dt, a, p));
             }
@@ -122,7 +123,7 @@ namespace particles
 
         private void Enqueue(CollisionEvent event_)
         {
-            var discardedEvent = _eventQueue.Push(event_);
+            var discardedEvent = _eventHeap.Add(event_);
             if (discardedEvent != null)
                 _collisionEventSource.Reclaim(discardedEvent);
         }
