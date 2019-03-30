@@ -20,6 +20,15 @@ namespace particles
             return new BinaryMinHeap<T>(comparer, preSize);
         }
 
+        /// <summary>
+        /// Guaranteed to keep the highest priority N items, where N = maxSize. Memory usage
+        /// beyond this is limited.
+        /// </summary>
+        public static BinaryMinHeap<T> CreateWithSizeLimit(IComparer<T> comparer, int maxSize)
+        {
+            return new BinaryMinHeap<T>(comparer, maxSize, maxSize);
+        }
+
         private BinaryMinHeap(IComparer<T> comparer, int preSize = -1, int keepMinNItems = -1)
         {
             _comparer = comparer;

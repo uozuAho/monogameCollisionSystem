@@ -43,7 +43,7 @@ namespace particles
         {
             Particles = particles.ToArray();
             var preFillArraySize = Particles.Length * Particles.Length * 100;
-            _eventHeap = BinaryMinHeap<CollisionEvent>.CreateAndPreSize(
+            _eventHeap = BinaryMinHeap<CollisionEvent>.CreateWithSizeLimit(
                 new EventTimeComparer(), preFillArraySize);
             _collisionEventSource = new CollisionEventSource(preFillArraySize);
             PredictAllParticles();
