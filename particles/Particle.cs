@@ -57,27 +57,6 @@ namespace particles
             this.mass = mass;
         }
 
-        public Particle Clone()
-        {
-            return new Particle(posX, posY, vx, vy, radius, mass);
-        }
-
-        /**
-         * Initializes a particle with a random position and velocity.
-         * The position is uniform in the unit box; the velocity in
-         * either direction is chosen uniformly at random.
-         */
-//        public Particle()
-//        {
-//        rx     = StdRandom.uniform(0.0, 1.0);
-//        ry     = StdRandom.uniform(0.0, 1.0);
-//        vx     = StdRandom.uniform(-0.005, 0.005);
-//        vy     = StdRandom.uniform(-0.005, 0.005);
-//        radius = 0.02;
-//        mass   = 0.5;
-//        color  = Color.BLACK;
-//        }
-
         /**
          * Moves this particle in a straight line (based on its velocity)
          * for the specified amount of time.
@@ -183,18 +162,6 @@ namespace particles
         {
             vy = -vy;
             NumCollisions++;
-        }
-
-        /**
-         * Returns the kinetic energy of this particle.
-         * The kinetic energy is given by the formula 1/2 <em>m</em> <em>v</em><sup>2</sup>,
-         * where <em>m</em> is the mass of this particle and <em>v</em> is its velocity.
-         *
-         * @return the kinetic energy of this particle
-         */
-        public double kineticEnergy()
-        {
-            return 0.5 * mass * (vx * vx + vy * vy);
         }
     }
 }

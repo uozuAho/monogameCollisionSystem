@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -30,8 +29,8 @@ namespace particles
     {
         public Particle[] Particles { get; }
 
-        private readonly MinPQ<CollisionEvent> _pq;
-        private CollisionEventSource _collisionEventSource;
+        private readonly BinaryMinHeap<CollisionEvent> _eventHeap;
+        private readonly CollisionEventSource _collisionEventSource;
         private double _lastUpdateTime;
 
         /**
@@ -43,8 +42,10 @@ namespace particles
         public CollisionSystem(IEnumerable<Particle> particles)
         {
             Particles = particles.ToArray();
-            _pq = new MinPQ<CollisionEvent>(new EventTimeComparer());
-            _collisionEventSource = new CollisionEventSource();
+            var preFillArraySize = Particles.Length * Particles.Length * 100;
+            _eventHeap = BinaryMinHeap<CollisionEvent>.CreateWithSizeLimit(
+                new EventTimeComparer(), preFillArraySize);
+            _collisionEventSource = new CollisionEventSource(preFillArraySize);
             PredictAllParticles();
         }
 
@@ -58,15 +59,17 @@ namespace particles
         
         public void Update(double nowSeconds)
         {
-            if (_pq.Peek().Time > nowSeconds)
-            {
-                UpdateAllParticles(nowSeconds);
-            }
+            if (_eventHeap.PeekMin().Time > nowSeconds)
+                MoveAllParticles(nowSeconds);
 
-            // handle all events up to current time
-            while (_pq.Peek().Time <= nowSeconds)
+            ProcessEvents(nowSeconds);
+        }
+
+        private void ProcessEvents(double nowSeconds)
+        {
+            while (_eventHeap.PeekMin().Time <= nowSeconds)
             {
-                var event_ = _pq.Pop();
+                var event_ = _eventHeap.RemoveMin();
                 if (!event_.IsValid())
                 {
                     _collisionEventSource.Reclaim(event_);
@@ -76,12 +79,12 @@ namespace particles
                 var a = event_.A;
                 var b = event_.B;
 
-                UpdateAllParticles(event_.Time);
+                MoveAllParticles(event_.Time);
 
                 if (a != null && b != null) a.bounceOff(b);
                 else if (a != null) a.bounceOffVerticalWall();
                 else if (b != null) b.bounceOffHorizontalWall();
-    
+
                 EnqueueCollisionTimes(a);
                 EnqueueCollisionTimes(b);
 
@@ -89,7 +92,7 @@ namespace particles
             }
         }
 
-        private void UpdateAllParticles(double nowSeconds)
+        private void MoveAllParticles(double nowSeconds)
         {
             foreach (var p in Particles)
             {
@@ -104,17 +107,25 @@ namespace particles
             if (a == null) return;
 
             // particle-particle collisions
-            foreach (var p in Particles)
+            for (var i = 0; i < Particles.Length; i++)
             {
+                var p = Particles[i];
                 var dt = a.timeToHit(p);
-                _pq.Push(_collisionEventSource.NewEvent(_lastUpdateTime + dt, a, p));
+                Enqueue(_collisionEventSource.NewEvent(_lastUpdateTime + dt, a, p));
             }
 
             // particle-wall collisions
             var dtX = a.timeToHitVerticalWall();
             var dtY = a.timeToHitHorizontalWall();
-            _pq.Push(_collisionEventSource.NewEvent(_lastUpdateTime + dtX, a, null));
-            _pq.Push(_collisionEventSource.NewEvent(_lastUpdateTime + dtY, null, a));
+            Enqueue(_collisionEventSource.NewEvent(_lastUpdateTime + dtX, a, null));
+            Enqueue(_collisionEventSource.NewEvent(_lastUpdateTime + dtY, null, a));
+        }
+
+        private void Enqueue(CollisionEvent event_)
+        {
+            var discardedEvent = _eventHeap.Add(event_);
+            if (discardedEvent != null)
+                _collisionEventSource.Reclaim(discardedEvent);
         }
 
         private class EventTimeComparer : IComparer<CollisionEvent>

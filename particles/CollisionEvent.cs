@@ -14,7 +14,7 @@ namespace particles
     /// </remarks>
     internal class CollisionEvent
     {
-        public double Time { get; private set; }
+        public double Time;
         public Particle A { get; private set; }
         public Particle B { get; private set; }
         private int _countA; // collision counts at event creation
