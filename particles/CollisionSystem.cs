@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -43,9 +44,10 @@ namespace particles
         {
             Particles = particles.ToArray();
             var preFillArraySize = Particles.Length * Particles.Length * 100;
-            _eventHeap = BinaryMinHeap<CollisionEvent>.CreateWithSizeLimit(
-                new EventTimeComparer(), preFillArraySize);
-            _collisionEventSource = new CollisionEventSource(preFillArraySize);
+//            _eventHeap = BinaryMinHeap<CollisionEvent>.CreateWithSizeLimit(
+//                new EventTimeComparer(), preFillArraySize);
+            _eventHeap = new BinaryMinHeap<CollisionEvent>(new EventTimeComparer());
+            _collisionEventSource = new CollisionEventSource();
             PredictAllParticles();
         }
 
@@ -111,14 +113,17 @@ namespace particles
             {
                 var p = Particles[i];
                 var dt = a.timeToHit(p);
-                Enqueue(_collisionEventSource.NewEvent(_lastUpdateTime + dt, a, p));
+                if (!double.IsInfinity(dt))
+                    Enqueue(_collisionEventSource.NewEvent(_lastUpdateTime + dt, a, p));
             }
 
             // particle-wall collisions
             var dtX = a.timeToHitVerticalWall();
             var dtY = a.timeToHitHorizontalWall();
-            Enqueue(_collisionEventSource.NewEvent(_lastUpdateTime + dtX, a, null));
-            Enqueue(_collisionEventSource.NewEvent(_lastUpdateTime + dtY, null, a));
+            if (!double.IsInfinity(dtX))
+                Enqueue(_collisionEventSource.NewEvent(_lastUpdateTime + dtX, a, null));
+            if (!double.IsInfinity(dtY))
+                Enqueue(_collisionEventSource.NewEvent(_lastUpdateTime + dtY, null, a));
         }
 
         private void Enqueue(CollisionEvent event_)
