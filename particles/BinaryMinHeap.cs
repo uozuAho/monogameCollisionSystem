@@ -13,7 +13,7 @@ namespace particles
         private readonly IComparer<T> _comparer;
         private readonly int _maxSize;
 
-        public BinaryMinHeap(IComparer<T> comparer) : this(comparer, -1, 1) {}
+        public BinaryMinHeap(IComparer<T> comparer) : this(comparer, -1, -1) {}
 
         public static BinaryMinHeap<T> CreateAndPreSize(IComparer<T> comparer, int preSize)
         {
