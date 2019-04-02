@@ -26,7 +26,7 @@ namespace particles.monogame
         {
             var width = spriteBatch.GraphicsDevice.Viewport.Width;
             var height = spriteBatch.GraphicsDevice.Viewport.Height;
-            var box = new Rectangle((int) (particle.posX * width), (int) (particle.posY * height), 20, 20);
+            var box = new Rectangle((int) (particle.posX * width), (int) (particle.posY * height), 2, 2);
             spriteBatch.Draw(_particleTexture, box, Color.Red);
         }
     }

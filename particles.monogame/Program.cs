@@ -12,7 +12,7 @@ namespace particles.monogame
         {
             var particles = args.Length > 0
                 ? LoadParticlesFromFile(args[0])
-                : GenerateParticles(300);
+                : GenerateParticles(1000);
 
             var collisionSystem = new CollisionSystem(particles);
             
@@ -36,7 +36,7 @@ namespace particles.monogame
                     rng.NextDouble(),
                     rng.NextDouble() * 0.5,
                     rng.NextDouble() * 0.5,
-                    .01,
+                    .0005,
                     1
                 );
             }
