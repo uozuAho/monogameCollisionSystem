@@ -3,14 +3,14 @@ using NUnit.Framework;
 
 namespace particles.test
 {
-    class BinaryMinHeapTests
+    public class BinaryMinHeapTests
     {
         private BinaryMinHeap<int> _intHeap;
 
         [Test]
         public void GivenKeepMin2Items_ShouldHold3Not4()
         {
-            _intHeap = new BinaryMinHeap<int>(new IntComparer(), 2);
+            _intHeap = BinaryMinHeap<int>.CreateWithSizeLimit(new IntComparer(), 2);
 
             Assert.AreEqual(0, _intHeap.Add(1));
             Assert.AreEqual(0, _intHeap.Add(2));
@@ -23,7 +23,7 @@ namespace particles.test
         [Test]
         public void GivenKeepMin2Items_AddInReverseOrder_ShouldHold3Not4()
         {
-            _intHeap = new BinaryMinHeap<int>(new IntComparer(), 2);
+            _intHeap = BinaryMinHeap<int>.CreateWithSizeLimit(new IntComparer(), 2);
 
             Assert.AreEqual(0, _intHeap.Add(4));
             Assert.AreEqual(0, _intHeap.Add(3));
