@@ -30,7 +30,7 @@ namespace particles.monogame
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            var particleTexture = Content.Load<Texture2D>("dot_20x20");
+            var particleTexture = Content.Load<Texture2D>("dot_5x5");
             _metricFont = Content.Load<SpriteFont>("metric");
             _updateMetricRenderer = new TimerMetricRenderer(_metricFont, "update", new Vector2(0, 0));
             _drawMetricRenderer = new TimerMetricRenderer(_metricFont, "draw", new Vector2(0, 20));

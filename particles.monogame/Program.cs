@@ -10,8 +10,10 @@ namespace particles.monogame
         [STAThread]
         static void Main(string[] args)
         {
-//            var particles = LoadParticlesFromFile(args[0]);
-            var particles = GenerateParticles(300);
+            var particles = args.Length > 0
+                ? LoadParticlesFromFile(args[0])
+                : GenerateParticles(1000);
+
             var collisionSystem = new CollisionSystem(particles);
             
             using (var game = new Game1(collisionSystem))
@@ -34,7 +36,7 @@ namespace particles.monogame
                     rng.NextDouble(),
                     rng.NextDouble() * 0.5,
                     rng.NextDouble() * 0.5,
-                    .01,
+                    .0005,
                     1
                 );
             }
