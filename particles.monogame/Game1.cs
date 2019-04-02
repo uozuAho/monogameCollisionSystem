@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -31,16 +32,16 @@ namespace particles.monogame
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             var particleTexture = Content.Load<Texture2D>("dot_20x20");
-            _metricFont = Content.Load<SpriteFont>("metric");
-            _updateMetricRenderer = new TimerMetricRenderer(_metricFont, "update", new Vector2(0, 0));
-            _drawMetricRenderer = new TimerMetricRenderer(_metricFont, "draw", new Vector2(0, 20));
-            _fpsMetricRenderer = new FpsMetricRenderer(_metricFont, new Vector2(0, 40));
+//            _metricFont = Content.Load<SpriteFont>("metric");
+//            _updateMetricRenderer = new TimerMetricRenderer(_metricFont, "update", new Vector2(0, 0));
+//            _drawMetricRenderer = new TimerMetricRenderer(_metricFont, "draw", new Vector2(0, 20));
+//            _fpsMetricRenderer = new FpsMetricRenderer(_metricFont, new Vector2(0, 40));
             _collisionSystemRenderer = new CollisionSystemRenderer(_collisionSystem, particleTexture);
         }
 
         protected override void Update(GameTime gameTime)
         {
-            _updateMetric.Begin();
+//            _updateMetric.Begin();
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
@@ -49,21 +50,21 @@ namespace particles.monogame
 
             base.Update(gameTime);
 
-            _updateMetric.End();
+//            _updateMetric.End();
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            _drawMetric.Begin();
-            _fpsMetric.OnFrame();
+//            _drawMetric.Begin();
+//            _fpsMetric.OnFrame();
 
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
             _collisionSystemRenderer.Draw(spriteBatch);
-            _updateMetricRenderer.Draw(spriteBatch, _updateMetric);
-            _drawMetricRenderer.Draw(spriteBatch, _drawMetric);
-            _fpsMetricRenderer.Draw(spriteBatch, _fpsMetric);
+//            _updateMetricRenderer.Draw(spriteBatch, _updateMetric);
+//            _drawMetricRenderer.Draw(spriteBatch, _drawMetric);
+//            _fpsMetricRenderer.Draw(spriteBatch, _fpsMetric);
             spriteBatch.End();
 
             base.Draw(gameTime);

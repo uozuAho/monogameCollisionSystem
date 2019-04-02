@@ -24,11 +24,3 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:dot_20x20.png
-
-#begin metric.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:metric.spritefont
-
